@@ -39,6 +39,31 @@ const els = {
   searchInput: document.getElementById("search-input"),
 };
 
+// Map OpenWeather "main" values to your local icon files
+const weatherIconMap = {
+  Clear: "sun.svg",
+  Clouds: "cloud.svg",
+  Rain: "rain.svg",
+  Drizzle: "rain.svg",
+  Thunderstorm: "storm.svg",
+  Snow: "snow.svg",
+  Mist: "fog.svg",
+  Smoke: "fog.svg",
+  Haze: "fog.svg",
+  Dust: "fog.svg",
+  Fog: "fog.svg",
+  Sand: "fog.svg",
+  Ash: "fog.svg",
+  Squall: "storm.svg",
+  Tornado: "storm.svg",
+};
+
+// Helper: returns full path to local icon
+function getLocalIconFromMain(main) {
+  const fileName = weatherIconMap[main] || "cloud.svg"; // fallback icon
+  return `assets/icons/${fileName}`;
+}
+
 
 async function fetchWeatherByCity(city) {
   const res = await fetch(
@@ -90,6 +115,15 @@ function renderCurrentWeather(data) {
   const timezoneOffset = data.timezone; // seconds
   els.sunriseTime.textContent = formatTime(data.sys.sunrise, timezoneOffset);
   els.sunsetTime.textContent = formatTime(data.sys.sunset, timezoneOffset);
+
+  // 🔹 NEW: update main weather icon
+  const main = data.weather[0].main; // e.g. "Clear", "Clouds", "Rain"
+  const iconPath = getLocalIconFromMain(main);
+  const mainIcon = document.getElementById("main-weather-icon");
+  if (mainIcon) {
+    mainIcon.src = iconPath;
+    mainIcon.alt = data.weather[0].description;
+  }
 }
 
 function renderAirQuality(aqiData) {
@@ -143,8 +177,9 @@ function renderForecast(forecast) {
     const midday =
       entries.find((e) => e.dt_txt.includes("12:00:00")) || entries[0];
 
-    const iconCode = midday.weather[0].icon;
-    const description = midday.weather[0].main;
+    const main = midday.weather[0].main;
+    const description = midday.weather[0].description;
+    const iconPath = getLocalIconFromMain(main);
 
     const li = document.createElement("li");
     li.className = "forecast-item";
@@ -156,7 +191,7 @@ function renderForecast(forecast) {
 
     li.innerHTML = `
       <span class="forecast-day">${weekday}</span>
-      <img src="https://openweathermap.org/img/wn/${iconCode}.png" alt="${description}" class="forecast-icon" />
+      <img src="${iconPath}" alt="${description}" class="forecast-icon" />
       <span class="forecast-desc">${description}</span>
       <span class="forecast-temp">${min}° / ${max}°</span>
     `;
@@ -205,7 +240,7 @@ function renderTempTimeline(forecast) {
       return `
         <div class="timeline-item">
           <span class="timeline-label">${slot.label}</span>
-          <img src="https://openweathermap.org/img/wn/${icon}.png" alt="${desc}" class="timeline-icon" />
+          <img src="${iconPath}" alt="${desc}" class="timeline-icon" />
           <span class="timeline-temp">${temp}°C</span>
         </div>
       `;

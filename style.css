@@ -247,8 +247,9 @@ body {
     }
 
     .forecast-icon {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
     }
 
     /* Timeline */
@@ -269,5 +270,17 @@ body {
 
     .timeline-temp {
         font-weight: 600;
+    }
+
+    .timeline-icon {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+    }
+
+    .main-weather-icon {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
     }
 }
