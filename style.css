@@ -1,0 +1,219 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Poppins", sans-serif;
+  background: #f7f7fb;
+  color: #1f2330;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  background: #ffffff;
+  border-right: 1px solid #ececf4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 0;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 40px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nav-item {
+  border: none;
+  background: transparent;
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.nav-item--active {
+  background: #ff8a3d20;
+}
+
+/* Main area */
+.main {
+  padding: 24px 32px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.user-greeting .subtitle {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.user-greeting h1 {
+  margin: 4px 0 0;
+  font-size: 26px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 8px 10px;
+  border-radius: 999px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.search input {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  min-width: 230px;
+}
+
+.search-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #ffc489;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+/* Cards grid */
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1.4fr;
+  grid-template-rows: auto auto;
+  gap: 20px;
+}
+
+/* Make some items span rows/cols as needed */
+.weather-card {
+  grid-column: 1 / 2;
+}
+
+.aqi-card {
+  grid-column: 2 / 3;
+}
+
+.temp-timeline {
+  grid-column: 1 / 3;
+}
+
+.tomorrow-card {
+  grid-column: 2 / 3;
+}
+
+.right-column {
+  grid-row: 1 / 3;
+  grid-column: 3 / 4;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Generic card */
+.card {
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 20px 22px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+/* Pills */
+.weather-extra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.pill {
+  border-radius: 18px;
+  padding: 10px 16px;
+  min-width: 110px;
+}
+
+.pill--dark {
+  background: #141927;
+  color: #ffffff;
+}
+
+.pill--light {
+  background: #f4f7ff;
+}
+
+.pill-label {
+  font-size: 11px;
+  opacity: 0.7;
+  margin: 0 0 2px;
+}
+
+.pill-value {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+
+  .right-column {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+}
