@@ -1,27 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Nimbus Weather Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
   <div class="app">
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="logo">
-        <span class="logo-icon">☼</span>
+        <span class="logo-icon">
+          <i data-lucide="sun"></i>
+        </span>
         <span class="logo-text">NIMBUS</span>
       </div>
 
       <nav class="sidebar-nav">
         <button class="nav-item nav-item--active">
-          <span class="nav-icon">🏠</span>
+          <i data-lucide="home" class="nav-icon"></i>
         </button>
-        <button class="nav-item"><span class="nav-icon">📍</span></button>
-        <button class="nav-item"><span class="nav-icon">⭐</span></button>
-        <button class="nav-item"><span class="nav-icon">⚙</span></button>
+        <button class="nav-item">
+          <i data-lucide="map-pin" class="nav-icon"></i>
+        </button>
+        <button class="nav-item">
+          <i data-lucide="star" class="nav-icon"></i>
+        </button>
+        <button class="nav-item">
+          <i data-lucide="settings" class="nav-icon"></i>
+        </button>
       </nav>
     </aside>
 
@@ -36,13 +48,10 @@
 
         <div class="topbar-right">
           <form id="search-form" class="search">
-            <input
-              id="search-input"
-              type="text"
-              placeholder="Search city..."
-              autocomplete="off"
-            />
-            <button type="submit" class="search-btn">🔍</button>
+            <input id="search-input" type="text" placeholder="Search city..." autocomplete="off" />
+            <button type="submit" class="search-btn">
+              <i data-lucide="search"></i>
+            </button>
           </form>
           <div class="avatar">
             <span>J</span>
@@ -52,25 +61,28 @@
 
       <!-- Grid Layout -->
       <section class="grid">
-        <!-- Current Weather Card -->
+        <!-- CURRENT WEATHER CARD -->
         <section class="card weather-card" id="current-weather">
-          <div class="card-header">
-            <h2>Weather</h2>
-            <p class="card-subtitle" id="weather-tagline">What’s the weather.</p>
+          <div class="card-header card-header--weather">
+            <div class="card-header-left">
+              <div class="card-icon card-icon--weather">
+                <i data-lucide="cloud-sun"></i>
+              </div>
+              <div>
+                <p class="card-eyebrow">Weather</p>
+                <h2 class="card-title">What’s the weather.</h2>
+              </div>
+            </div>
           </div>
 
           <div class="weather-main">
-            <div>
+            <div class="weather-info">
               <div class="temp">
                 <span id="temp-value">22</span><span class="temp-unit">°C</span>
               </div>
               <p id="weather-desc">Partly cloudy</p>
               <p id="weather-location">Banten, Indonesia</p>
             </div>
-
-          <div class="weather-illustration">
-            <img id="main-weather-icon" class="main-weather-icon" src="assets/icons/sun.svg" alt="Weather icon" />
-          </div>
           </div>
 
           <div class="weather-extra">
@@ -89,23 +101,36 @@
           </div>
         </section>
 
-        <!-- Air Quality Card -->
+        <!-- AIR QUALITY CARD -->
         <section class="card aqi-card" id="air-quality">
-          <h2>Air Quality</h2>
-          <p class="card-subtitle">Main pollutant: <span id="main-pollutant">PM 2.5</span></p>
-
-          <div class="aqi-value">
-            <span id="aqi-number">390</span>
-            <span class="aqi-badge" id="aqi-status">Standard</span>
+          <div class="card-header card-header--aqi">
+            <div class="card-header-left">
+              <div class="card-icon card-icon--aqi">
+                <i data-lucide="wind"></i>
+              </div>
+              <div>
+                <p class="card-eyebrow">Air Quality</p>
+                <h2 class="card-title">
+                  Main pollutant: <span id="main-pollutant">PM 2.5</span>
+                </h2>
+              </div>
+            </div>
           </div>
-          <p id="aqi-wind">West wind</p>
 
-          <div class="aqi-scale">
-            <span>Good</span>
+          <div class="aqi-main">
+            <div class="aqi-value-block">
+              <span id="aqi-number" class="aqi-number">390</span>
+              <span class="aqi-chip" id="aqi-status">Standard</span>
+              <p class="aqi-wind" id="aqi-wind">West wind</p>
+            </div>
+          </div>
+
+          <div class="aqi-scale-row">
+            <span class="aqi-scale-label">Good</span>
             <div class="aqi-bar">
               <div class="aqi-indicator" id="aqi-indicator"></div>
             </div>
-            <span>Hazardous</span>
+            <span class="aqi-scale-label">Hazardous</span>
           </div>
         </section>
 
@@ -123,63 +148,98 @@
           <p class="card-subtitle">Tomorrow</p>
           <h2 id="tomorrow-city">Alam Barzah</h2>
           <div class="tomorrow-main">
-            <p class="tomorrow-temp"><span id="tomorrow-temp">20</span>°C</p>
+            <p class="tomorrow-temp">
+              <span id="tomorrow-temp">20</span>°C
+            </p>
             <p id="tomorrow-desc">Rainy</p>
           </div>
           <div class="tomorrow-illustration">
-            <!-- person with umbrella (CSS / img) -->
+            <!-- Reserved for future (no images used now) -->
           </div>
         </section>
 
-        <!-- Right Column: Sun, UV, 5-Day -->
+        <!-- Right Column: Sun, UV, 3-day + 5-day Forecast -->
         <section class="right-column">
-          <!-- Sun & UV -->
+          <!-- SUN CARD -->
           <section class="card sun-card">
             <div class="sun-header">
-              <h2>Sun</h2>
-              <p id="sun-location">Banten, Indonesia</p>
-              <p id="sun-current-temp">22°C</p>
+              <div class="sun-info">
+                <p class="sun-label">Sun</p>
+                <p id="sun-location" class="sun-location">Banten, Indonesia</p>
+              </div>
+              <p id="sun-current-temp" class="sun-temp">22°C</p>
             </div>
+
+            <hr class="sun-divider" />
 
             <div class="sun-arc">
-              <!-- semi-circle arc using CSS; JS sets indicators -->
-              <div class="sun-times">
-                <div class="sun-time">
-                  <span>Sunset</span>
-                  <span id="sunset-time">06:00 pm</span>
-                </div>
-                <div class="sun-time">
-                  <span>Sunrise</span>
-                  <span id="sunrise-time">06:45 am</span>
-                </div>
-              </div>
-            </div>
+              <div class="sun-curve"></div>
+              <div id="sun-emoji" class="sun-emoji">☀️</div>
 
-            <div class="uv-card">
-              <div class="uv-main">
-                <span class="uv-icon">☀</span>
-                <div>
-                  <p><span id="uv-value">20</span> UVI</p>
-                  <p id="uv-level">Moderate risk of UV rays</p>
+              <div class="sun-baseline">
+                <!-- Left end: Sunrise -->
+                <div class="sun-dot sun-dot--left"></div>
+                <div class="sun-label-text sun-label-text--sunrise">
+                  <span class="sun-time-label">Sunrise</span>
+                  <span id="sunrise-time" class="sun-time-value">7:02 am</span>
                 </div>
-                <span class="uv-badge" id="uv-badge">Moderate</span>
+
+                <!-- Right end: Sunset -->
+                <div class="sun-dot sun-dot--right"></div>
+                <div class="sun-label-text sun-label-text--sunset">
+                  <span class="sun-time-label">Sunset</span>
+                  <span id="sunset-time" class="sun-time-value">5:24 pm</span>
+                </div>
               </div>
             </div>
           </section>
 
-          <!-- 5-Day Forecast -->
-          <section class="card forecast-card">
-            <h2>Weather Prediction</h2>
-            <ul class="forecast-list" id="forecast-list">
-              <!-- JS injects <li> for next 5 days -->
-            </ul>
-            <button class="btn-outline" id="next5-btn">Next 5 Days</button>
-          </section>
+          <!-- UV CARD -->
+          <div class="uv-card">
+            <div class="uv-left">
+              <div class="uv-icon-circle">
+                <i data-lucide="sun-medium" class="uv-icon"></i>
+              </div>
+              <div class="uv-text">
+                <p class="uv-value">
+                  <span id="uv-value">20</span> UVI
+                </p>
+                <p class="uv-desc" id="uv-level">
+                  Moderate risk of UV rays
+                </p>
+              </div>
+            </div>
+            <span id="uv-badge" class="uv-badge">Moderate</span>
+          </div>
+        </section>
+
+        <!-- WEATHER PREDICTION CARD -->
+        <section class="card forecast-card">
+          <h2 class="forecast-title">Weather Prediction</h2>
+
+          <ul class="forecast-list" id="forecast-list">
+            <!-- JS injects <li> for next days (show 3 by default, 5 on button click) -->
+          </ul>
+
+          <button class="next5-btn" id="next5-btn">
+            <span>Next 5 Days</span>
+            <i data-lucide="calendar" class="next5-icon"></i>
+          </button>
         </section>
       </section>
     </main>
   </div>
+
   <script src="config.js"></script>
   <script src="app.js"></script>
+  <script>
+    // Initialize Lucide icons after DOM + scripts are loaded
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    });
+  </script>
 </body>
+
 </html>

@@ -30,6 +30,7 @@ const els = {
   sunCurrentTemp: document.getElementById("sun-current-temp"),
   sunriseTime: document.getElementById("sunrise-time"),
   sunsetTime: document.getElementById("sunset-time"),
+  currentTime: document.getElementById("current-time"),
   uvValue: document.getElementById("uv-value"),
   uvLevel: document.getElementById("uv-level"),
   uvBadge: document.getElementById("uv-badge"),
@@ -39,35 +40,38 @@ const els = {
   searchInput: document.getElementById("search-input"),
 };
 
-// Map OpenWeather "main" values to your local icon files
-const weatherIconMap = {
-  Clear: "sun.svg",
-  Clouds: "cloud.svg",
-  Rain: "rain.svg",
-  Drizzle: "rain.svg",
-  Thunderstorm: "storm.svg",
-  Snow: "snow.svg",
-  Mist: "fog.svg",
-  Smoke: "fog.svg",
-  Haze: "fog.svg",
-  Dust: "fog.svg",
-  Fog: "fog.svg",
-  Sand: "fog.svg",
-  Ash: "fog.svg",
-  Squall: "storm.svg",
-  Tornado: "storm.svg",
+// Map OpenWeather "main" values to Lucide icon names
+const conditionIconMap = {
+  Clear: "sun",
+  Clouds: "cloud",
+  Rain: "cloud-rain",
+  Drizzle: "cloud-drizzle",
+  Thunderstorm: "cloud-lightning",
+  Snow: "cloud-snow",
+  Mist: "cloud-fog",
+  Smoke: "cloud-fog",
+  Haze: "cloud-fog",
+  Dust: "cloud-fog",
+  Fog: "cloud-fog",
+  Sand: "cloud-fog",
+  Ash: "cloud-fog",
+  Squall: "wind",
+  Tornado: "wind",
 };
 
-// Helper: returns full path to local icon
-function getLocalIconFromMain(main) {
-  const fileName = weatherIconMap[main] || "cloud.svg"; // fallback icon
-  return `assets/icons/${fileName}`;
+// Helper: returns Lucide icon name for a weather "main" string
+function getLucideIconName(main) {
+  return conditionIconMap[main] || "cloud";
 }
 
+// Flag to toggle 3-day / 5-day forecast view
+let showFullForecast = false;
 
 async function fetchWeatherByCity(city) {
   const res = await fetch(
-    `${BASE_URL}/weather?q=${encodeURIComponent(city)}&units=metric&appid=${API_KEY}`
+    `${BASE_URL}/weather?q=${encodeURIComponent(
+      city
+    )}&units=metric&appid=${API_KEY}`
   );
   if (!res.ok) throw new Error("City not found");
   return res.json();
@@ -99,7 +103,6 @@ function formatTime(unixSeconds, timezoneOffset) {
   return `${hours}:${minutes} ${ampm}`;
 }
 
-
 function renderCurrentWeather(data) {
   els.tempValue.textContent = Math.round(data.main.temp);
   els.weatherDesc.textContent = data.weather[0].description;
@@ -115,16 +118,13 @@ function renderCurrentWeather(data) {
   const timezoneOffset = data.timezone; // seconds
   els.sunriseTime.textContent = formatTime(data.sys.sunrise, timezoneOffset);
   els.sunsetTime.textContent = formatTime(data.sys.sunset, timezoneOffset);
-
-  // 🔹 NEW: update main weather icon
-  const main = data.weather[0].main; // e.g. "Clear", "Clouds", "Rain"
-  const iconPath = getLocalIconFromMain(main);
-  const mainIcon = document.getElementById("main-weather-icon");
-  if (mainIcon) {
-    mainIcon.src = iconPath;
-    mainIcon.alt = data.weather[0].description;
+  if (els.currentTime) {
+    els.currentTime.textContent = formatTime(data.dt, timezoneOffset);
   }
+
+  updateSunArc(data);
 }
+
 
 function renderAirQuality(aqiData) {
   const record = aqiData.list[0];
@@ -158,6 +158,7 @@ function buildDailyForecastMap(forecast) {
   return map;
 }
 
+// Renders 3 days by default, 5 days when showFullForecast = true
 function renderForecast(forecast) {
   const dailyMap = buildDailyForecastMap(forecast);
   const dates = Object.keys(dailyMap);
@@ -165,9 +166,11 @@ function renderForecast(forecast) {
   const todayStr = new Date().toISOString().slice(0, 10);
   const nextDays = dates.filter((d) => d !== todayStr).slice(0, 5);
 
+  const visibleDays = showFullForecast ? nextDays : nextDays.slice(0, 3);
+
   els.forecastList.innerHTML = "";
 
-  nextDays.forEach((dateStr, index) => {
+  visibleDays.forEach((dateStr, index) => {
     const entries = dailyMap[dateStr];
 
     const temps = entries.map((e) => e.main.temp);
@@ -179,32 +182,58 @@ function renderForecast(forecast) {
 
     const main = midday.weather[0].main;
     const description = midday.weather[0].description;
-    const iconPath = getLocalIconFromMain(main);
+    const iconName = getLucideIconName(main);
 
     const li = document.createElement("li");
     li.className = "forecast-item";
 
     const dateObj = new Date(dateStr);
-    const weekday = dateObj.toLocaleDateString(undefined, {
-      weekday: "short",
+    const dateLabel = dateObj.toLocaleDateString(undefined, {
+      month: "long",
+      day: "numeric",
     });
 
     li.innerHTML = `
-      <span class="forecast-day">${weekday}</span>
-      <img src="${iconPath}" alt="${description}" class="forecast-icon" />
-      <span class="forecast-desc">${description}</span>
-      <span class="forecast-temp">${min}° / ${max}°</span>
+      <div class="forecast-left">
+        <div class="forecast-icon-wrapper">
+          <i data-lucide="${iconName}" class="forecast-icon"></i>
+        </div>
+        <div class="forecast-text">
+          <p class="forecast-date">${dateLabel}</p>
+          <p class="forecast-condition">${main}</p>
+        </div>
+      </div>
+      <div class="forecast-right">
+        <span class="forecast-temp-max">${max}°</span>
+        <span class="forecast-temp-min"> / ${min}°</span>
+      </div>
     `;
 
     els.forecastList.appendChild(li);
 
-    // First next day = Tomorrow card
+    // First visible next day = Tomorrow card
     if (index === 0) {
       els.tomorrowCity.textContent = forecast.city.name;
       els.tomorrowTemp.textContent = max;
-      els.tomorrowDesc.textContent = description;
+      els.tomorrowDesc.textContent = main;
     }
   });
+
+  // Initialize Lucide icons inside the forecast list
+  if (window.lucide) {
+    window.lucide.createIcons(els.forecastList);
+  }
+
+  // Update button label
+  const nextBtn = document.getElementById("next5-btn");
+  if (nextBtn) {
+    const labelSpan = nextBtn.querySelector("span");
+    if (labelSpan) {
+      labelSpan.textContent = showFullForecast ? "Show Less" : "Next 5 Days";
+    } else {
+      nextBtn.textContent = showFullForecast ? "Show Less" : "Next 5 Days";
+    }
+  }
 }
 
 function renderTempTimeline(forecast) {
@@ -234,13 +263,13 @@ function renderTempTimeline(forecast) {
       if (!entry) return "";
 
       const temp = Math.round(entry.main.temp);
-      const icon = entry.weather[0].icon;
       const desc = entry.weather[0].main;
+      const iconName = getLucideIconName(desc);
 
       return `
         <div class="timeline-item">
           <span class="timeline-label">${slot.label}</span>
-          <img src="${iconPath}" alt="${desc}" class="timeline-icon" />
+          <i data-lucide="${iconName}" class="timeline-icon"></i>
           <span class="timeline-temp">${temp}°C</span>
         </div>
       `;
@@ -248,6 +277,11 @@ function renderTempTimeline(forecast) {
     .join("");
 
   els.tempTimeline.innerHTML = nodes;
+
+  // Initialize Lucide icons inside the timeline
+  if (window.lucide) {
+    window.lucide.createIcons(els.tempTimeline);
+  }
 }
 
 function renderUVFromWeather(currentWeather) {
@@ -278,6 +312,52 @@ function renderUVFromWeather(currentWeather) {
   els.uvLevel.textContent = message;
 }
 
+/**
+ * Animate the sun along the arc + daylight fill.
+ * Uses sunrise, sunset, and current dt from the API (all in UTC seconds).
+ */
+function updateSunArc(data) {
+  const sunArc = document.querySelector(".sun-arc");
+  const sunCurve = document.querySelector(".sun-curve");
+  const sunEmoji = document.getElementById("sun-emoji");
+  if (!sunArc || !sunCurve || !sunEmoji) return;
+
+  const sunrise = data.sys.sunrise;
+  const sunset = data.sys.sunset;
+  const now = data.dt;
+
+  let progress;
+  if (now <= sunrise) progress = 0;
+  else if (now >= sunset) progress = 1;
+  else progress = (now - sunrise) / (sunset - sunrise);
+
+  const rect = sunCurve.getBoundingClientRect();
+  const arcRect = sunArc.getBoundingClientRect();
+
+  const width = rect.width;
+  const height = rect.height; // radius
+  const centerX = (rect.left - arcRect.left) + width / 2;
+  const centerY = (rect.top - arcRect.top) + height;
+  const radius = height;
+
+  // smoother arc angle adjustment (small offset so emoji follows curve top perfectly)
+  const theta = Math.PI * (1 - progress);
+  const x = centerX + radius * Math.cos(theta);
+  const y = centerY - radius * Math.sin(theta);
+
+  // position sun slightly above the curve
+  sunEmoji.style.left = `${x}px`;
+  sunEmoji.style.top = `${y - 10}px`;
+}
+
+
+
+
+
+
+
+
+
 
 async function loadCity(city) {
   try {
@@ -288,6 +368,9 @@ async function loadCity(city) {
       fetchForecastByCoords(lat, lon),
       fetchAirQuality(lat, lon),
     ]);
+
+    // store latest forecast so the Next 5 Days button can re-render without refetch
+    window._latestForecastData = forecast;
 
     renderCurrentWeather(weather);
     renderForecast(forecast);
@@ -307,10 +390,22 @@ els.searchForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const city = els.searchInput.value.trim();
   if (!city) return;
+  // reset to 3-day view whenever a new city is searched
+  showFullForecast = false;
   loadCity(city);
 });
+
+// Toggle 3-day / 5-day forecast
+const next5Btn = document.getElementById("next5-btn");
+if (next5Btn) {
+  next5Btn.addEventListener("click", () => {
+    showFullForecast = !showFullForecast;
+    if (window._latestForecastData) {
+      renderForecast(window._latestForecastData);
+    }
+  });
+}
 
 // Initial load
 const lastCity = localStorage.getItem("lastCity") || "Delhi";
 loadCity(lastCity);
-
