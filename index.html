@@ -154,13 +154,13 @@
             <p id="tomorrow-desc">Rainy</p>
           </div>
           <div class="tomorrow-illustration">
-            <!-- Reserved for future (no images used now) -->
+            <!-- Reserved for future -->
           </div>
         </section>
 
-        <!-- Right Column: Sun, UV, 3-day + 5-day Forecast -->
+        <!-- Right Column: Sun + UV + Weather Prediction -->
         <section class="right-column">
-          <!-- SUN CARD -->
+          <!-- SUN + UV in one card -->
           <section class="card sun-card">
             <div class="sun-header">
               <div class="sun-info">
@@ -177,14 +177,14 @@
               <div id="sun-emoji" class="sun-emoji">☀️</div>
 
               <div class="sun-baseline">
-                <!-- Left end: Sunrise -->
+                <!-- Sunrise -->
                 <div class="sun-dot sun-dot--left"></div>
                 <div class="sun-label-text sun-label-text--sunrise">
                   <span class="sun-time-label">Sunrise</span>
                   <span id="sunrise-time" class="sun-time-value">7:02 am</span>
                 </div>
 
-                <!-- Right end: Sunset -->
+                <!-- Sunset -->
                 <div class="sun-dot sun-dot--right"></div>
                 <div class="sun-label-text sun-label-text--sunset">
                   <span class="sun-time-label">Sunset</span>
@@ -192,39 +192,39 @@
                 </div>
               </div>
             </div>
+
+            <!-- UV section now inside the same card -->
+            <div class="uv-card">
+              <div class="uv-left">
+                <div class="uv-icon-circle">
+                  <i data-lucide="sun-medium" class="uv-icon"></i>
+                </div>
+                <div class="uv-text">
+                  <p class="uv-value">
+                    <span id="uv-value">20</span> UVI
+                  </p>
+                  <p class="uv-desc" id="uv-level">
+                    Moderate risk of UV rays
+                  </p>
+                </div>
+              </div>
+              <span id="uv-badge" class="uv-badge">Moderate</span>
+            </div>
           </section>
 
-          <!-- UV CARD -->
-          <div class="uv-card">
-            <div class="uv-left">
-              <div class="uv-icon-circle">
-                <i data-lucide="sun-medium" class="uv-icon"></i>
-              </div>
-              <div class="uv-text">
-                <p class="uv-value">
-                  <span id="uv-value">20</span> UVI
-                </p>
-                <p class="uv-desc" id="uv-level">
-                  Moderate risk of UV rays
-                </p>
-              </div>
-            </div>
-            <span id="uv-badge" class="uv-badge">Moderate</span>
-          </div>
-        </section>
+          <!-- WEATHER PREDICTION CARD: now directly under Sun+UV -->
+          <section class="card forecast-card">
+            <h2 class="forecast-title">Weather Prediction</h2>
 
-        <!-- WEATHER PREDICTION CARD -->
-        <section class="card forecast-card">
-          <h2 class="forecast-title">Weather Prediction</h2>
+            <ul class="forecast-list" id="forecast-list">
+              <!-- JS injects <li> for next days (3 or 5) -->
+            </ul>
 
-          <ul class="forecast-list" id="forecast-list">
-            <!-- JS injects <li> for next days (show 3 by default, 5 on button click) -->
-          </ul>
-
-          <button class="next5-btn" id="next5-btn">
-            <span>Next 5 Days</span>
-            <i data-lucide="calendar" class="next5-icon"></i>
-          </button>
+            <button class="next5-btn" id="next5-btn">
+              <span>Next 5 Days</span>
+              <i data-lucide="calendar" class="next5-icon"></i>
+            </button>
+          </section>
         </section>
       </section>
     </main>
@@ -233,8 +233,7 @@
   <script src="config.js"></script>
   <script src="app.js"></script>
   <script>
-    // Initialize Lucide icons after DOM + scripts are loaded
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener("DOMContentLoaded", function () {
       if (window.lucide) {
         window.lucide.createIcons();
       }

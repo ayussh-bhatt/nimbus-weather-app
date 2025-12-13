@@ -65,10 +65,6 @@ svg[data-lucide] {
   height: 22px;
 }
 
-.timeline-icon {
-  width: 24px;
-  height: 24px;
-}
 
 /* Next 5 Days button icon */
 .next5-icon {
@@ -204,9 +200,6 @@ svg[data-lucide] {
   grid-column: 2 / 3;
 }
 
-.temp-timeline {
-  grid-column: 1 / 3;
-}
 
 .tomorrow-card {
   grid-column: 2 / 3;
@@ -754,6 +747,92 @@ svg[data-lucide] {
   transform: translateY(-1px);
 }
 
+/* ---------- Temperature timeline card ---------- */
+
+.temp-timeline {
+  border-radius: 28px;
+  padding: 18px 20px 20px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.temp-timeline h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* main row with four items + curve */
+.timeline {
+  position: relative;
+  margin-top: 18px;
+  padding: 24px 10px 8px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* simple smooth orange curve behind the icons */
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 42px;
+  height: 60px;
+  border-top: 3px solid #f97316;
+  opacity: 0.9;
+  border-radius: 999px;
+}
+
+/* each slot (Morning / Afternoon / ...) */
+.timeline-item {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 1; /* above the curve */
+}
+
+/* icon in circle */
+.timeline-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: #f3f4ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1);
+}
+
+.timeline-icon {
+  width: 22px;
+  height: 22px;
+}
+
+/* highlighted (hottest) slot */
+.timeline-item--active .timeline-icon-wrapper {
+  background: #111827;
+  color: #fefce8;
+}
+
+/* temp and label */
+.timeline-temp {
+  font-weight: 600;
+  font-size: 15px;
+  color: #111827;
+}
+
+.timeline-label {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 900px) {
@@ -798,6 +877,7 @@ svg[data-lucide] {
 
   .timeline {
     display: flex;
+    padding: 20px 6px 8px;
     justify-content: space-between;
     gap: 12px;
   }
@@ -813,10 +893,20 @@ svg[data-lucide] {
 
   .timeline-temp {
     font-weight: 600;
+    font-size: 14px;
   }
 
   .timeline-icon {
     width: 22px;
     height: 22px;
+  }
+
+    .timeline-label {
+    font-size: 11px;
+  }
+
+    .timeline-icon-wrapper {
+    width: 38px;
+    height: 38px;
   }
 }

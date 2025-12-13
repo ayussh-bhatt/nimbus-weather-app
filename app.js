@@ -64,6 +64,30 @@ function getLucideIconName(main) {
   return conditionIconMap[main] || "cloud";
 }
 
+// Map OpenWeather "main" → Lucide icon name (for timeline)
+const weatherLucideIconMap = {
+  Clear: "sun",
+  Clouds: "cloud",
+  Rain: "cloud-rain",
+  Drizzle: "cloud-drizzle",
+  Thunderstorm: "cloud-lightning",
+  Snow: "snowflake",
+  Mist: "cloud-fog",
+  Smoke: "cloud-fog",
+  Haze: "cloud-fog",
+  Dust: "cloud-fog",
+  Fog: "cloud-fog",
+  Sand: "cloud-fog",
+  Ash: "cloud-fog",
+  Squall: "wind",
+  Tornado: "wind",
+};
+
+function getLucideWeatherIcon(main) {
+  return weatherLucideIconMap[main] || "cloud";
+}
+
+
 // Flag to toggle 3-day / 5-day forecast view
 let showFullForecast = false;
 
@@ -254,23 +278,52 @@ function renderTempTimeline(forecast) {
     { label: "Night", time: "21:00:00" },
   ];
 
-  const nodes = slots
-    .map((slot) => {
-      const entry =
-        todayData.find((item) => item.dt_txt.includes(slot.time)) ||
-        todayData[todayData.length - 1];
+  // Collect data for each slot
+  const slotData = slots.map((slot) => {
+    const entry =
+      todayData.find((item) => item.dt_txt.includes(slot.time)) ||
+      todayData[todayData.length - 1];
 
-      if (!entry) return "";
+    if (!entry) return null;
 
-      const temp = Math.round(entry.main.temp);
-      const desc = entry.weather[0].main;
-      const iconName = getLucideIconName(desc);
+    const temp = Math.round(entry.main.temp);
+    const main = entry.weather[0].main; // e.g. "Clear", "Clouds", etc.
+    return {
+      label: slot.label,
+      temp,
+      main,
+    };
+  });
+
+  // Find hottest slot to highlight (like Afternoon in the reference)
+  let hottestIndex = slotData.findIndex((d) => d !== null);
+  if (hottestIndex === -1) {
+    els.tempTimeline.innerHTML = "<p>No data for today</p>";
+    return;
+  }
+
+  slotData.forEach((d, idx) => {
+    if (!d) return;
+    if (slotData[hottestIndex] && d.temp > slotData[hottestIndex].temp) {
+      hottestIndex = idx;
+    }
+  });
+
+  // Build UI
+  const nodes = slotData
+    .map((data, idx) => {
+      if (!data) return "";
+      const iconName = getLucideWeatherIcon(data.main);
+      const isActive = idx === hottestIndex;
+      const activeClass = isActive ? " timeline-item--active" : "";
 
       return `
-        <div class="timeline-item">
-          <span class="timeline-label">${slot.label}</span>
-          <i data-lucide="${iconName}" class="timeline-icon"></i>
-          <span class="timeline-temp">${temp}°C</span>
+        <div class="timeline-item${activeClass}">
+          <div class="timeline-icon-wrapper">
+            <i data-lucide="${iconName}" class="timeline-icon"></i>
+          </div>
+          <div class="timeline-temp">${data.temp}°C</div>
+          <div class="timeline-label">${data.label}</div>
         </div>
       `;
     })
@@ -278,11 +331,15 @@ function renderTempTimeline(forecast) {
 
   els.tempTimeline.innerHTML = nodes;
 
-  // Initialize Lucide icons inside the timeline
+  // Re-render Lucide icons for newly injected HTML
   if (window.lucide) {
-    window.lucide.createIcons(els.tempTimeline);
+    window.lucide.createIcons();
   }
 }
+
+
+
+
 
 function renderUVFromWeather(currentWeather) {
   const main = currentWeather.weather[0].main.toLowerCase();
